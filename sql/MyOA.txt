@@ -1,0 +1,575 @@
+
+--使用库   
+use GameCardSale   
+   
+--建立上下班时间表(WorkTime)   
+if exists(select * from sysobjects where name='WorkTime')   
+    drop table WorkTime   
+go   
+create table WorkTime   
+(   
+WorkTimeId int primary key identity(1,1),         --工作时间Id   
+OnDutyTime varchar(50) not null,     --上班时间   
+OffDutyTime varchar(50) not null     --下班时间   
+)   
+go   
+   
+insert into WorkTime values('8:30','5:30')   
+--建立文件类型表(FileTypeInfo)   
+if exists(select * from sysobjects where name='FileTypeInfo')   
+    drop table FileTypeInfo   
+go   
+create table FileTypeInfo   
+(   
+FileTypeId int primary key identity(1,1),        --文件类型id   
+FileTypeName varchar(50) not null,        --文件类姓名   
+FileTypeImage varchar(50) not null,    --文件类型对应的图标   
+FileTypeSuffix varchar(50) null     --文件类型后缀   
+)   
+go   
+   
+   
+--向文件类型表中插入数据   
+insert into FileTypeInfo values('文件夹','images/file/folder.gif','')   
+insert into FileTypeInfo values('Word文档','images/file/word.gif','doc')   
+insert into FileTypeInfo values('Excel文档','images/file/excel.gif','xls')   
+insert into FileTypeInfo values('Access文档','images/file/access.gif','mdb')   
+insert into FileTypeInfo values('文本文档','images/file/note1.gif','txt')   
+insert into FileTypeInfo values('超文本文档','images/file/html.gif','htm')   
+insert into FileTypeInfo values('可执行文件','images/file/exe.gif','exe')   
+insert into FileTypeInfo values('图片文档','images/file/bmp.gif','bmp')   
+insert into FileTypeInfo values('Acrobat文档','images/file/pdf.gif','pdf')   
+insert into FileTypeInfo values('PowerPoint演示文档','images/file/ppt.gif','ppt')   
+insert into FileTypeInfo values('压缩文档','images/file/zip.gif','zip')   
+insert into FileTypeInfo values('多媒体文档','images/file/media.gif','avi')   
+insert into FileTypeInfo values('其他文件','images/file/other.gif','noname')   
+   
+select * from FileTypeInfo   
+select * from FileTypeInfo where FileTypeSuffix='htm'   
+   
+   
+--建立机构信息表(BranchInfo)   
+if exists(select * from sysobjects where name='BranchInfo')   
+    drop table BranchInfo   
+go   
+create table BranchInfo   
+(   
+BranchId int primary key identity(1,1),    --机构id   
+BranchName varchar(50) not null,     --机构名称   
+BranchShortName varchar(50) not null,    --机构简称   
+IfDeleteBranch int not null --机构是否被删除1：为删除 0：已删除   
+)   
+go   
+   
+--性机构信息表中插入记录   
+insert into BranchInfo values('华北电力科学研究院','中国电力要地',1)   
+insert into BranchInfo values('中国科学院声学研究所','声学院',1)   
+insert into BranchInfo values('北大青鸟集团','IT学校',1)   
+insert into BranchInfo values('大堂国际盘山发电有限公司','简介略略略略略略',1)   
+insert into BranchInfo values('中国农科院','研究院',1)   
+   
+select * from BranchInfo   
+   
+--建立设置用户是否被屏蔽的状态表(UserState)   
+if exists(select * from sysobjects where name='UserState')   
+    drop table UserState   
+go   
+create table UserState   
+(   
+UserStateId int primary key identity(1,1),      --1：正常状态；0：被屏蔽   
+UserStateName varchar(50) not null      
+)   
+go   
+   
+--向用户状态表中插入数据   
+insert into UserState values('被屏蔽')   
+insert into UserState values('正常状态')   
+   
+   
+select * from UserState   
+   
+--建立存放菜单功能基本信息表(SysFun)   
+if exists(select * from sysobjects where name='SysFun')   
+    drop table SysFun   
+go   
+create table SysFun   
+(   
+NodeId int primary key not null,    --菜单节点id   
+DisplayName varchar(50) not null,           --菜单名称   
+NodeURL varchar(200),    --菜单连接地址   
+DisplayOrder int not null,    --菜单显示顺序   
+ParentNodeId int not null    --父节点id   
+)   
+go   
+   
+--向菜单功能表中插入数据   
+insert into SysFun values(101,'人事管理','',1,0)   
+insert into SysFun values(101001,'机构管理','PersonManage/jigou.aspx',1,101)   
+insert into SysFun values(101002,'部门管理','PersonManage/bumen.aspx',2,101)   
+insert into SysFun values(101003,'员工管理','Company/UserAll.aspx',3,101)   
+insert into SysFun values(102,'日程管理','',2,0)   
+insert into SysFun values(102001,'我的日程','ScheduleManage/MyDay.aspx',1,102)   
+insert into SysFun values(102002,'部门日程','ScheduleManage/BuMenSchedule.aspx',2,102)   
+insert into SysFun values(102003,'我的便签','ScheduleManage/scratchpad.aspx',3,102)   
+insert into SysFun values(103,'文档管理','',3,0)   
+insert into SysFun values(103001,'文档管理','File/FileManage.aspx',1,103)   
+insert into SysFun values(103002,'回收站','File/FileDelete.aspx',2,103)   
+insert into SysFun values(103003,'文件搜索','File/FileFind.aspx',3,103)   
+insert into SysFun values(104,'消息传递','',4,0)   
+insert into SysFun values(104001,'消息管理','Message/MessageManage.aspx',1,104)   
+insert into SysFun values(104002,'信箱','Message/News.aspx',2,104)   
+insert into SysFun values(105,'系统管理','',5,0)   
+insert into SysFun values(105001,'角色管理','Sysmagae/RoleManage.aspx',1,105)   
+insert into SysFun values(105002,'登陆日志','Sysmagae/LoginLog.aspx',2,105)   
+insert into SysFun values(105003,'操作日志','Sysmagae/OperateLog.aspx',3,105)   
+insert into SysFun values(105004,'菜单排序','Sysmagae/MenuAdjust.aspx',4,105)   
+insert into SysFun values(106,'考勤管理','',6,0)   
+insert into SysFun values(106001,'考勤统计','MonuoalSign/SignStatistic.aspx',1,106)   
+insert into SysFun values(106002,'考勤历史记录查询','MonuoalSign/ManualSignSearch.aspx',2,106)   
+insert into SysFun values(106003,'员工签到、签退','MonuoalSign/GoWork.aspx',3,106)   
+   
+   
+   
+   
+   
+   
+   
+   
+insert into SysFun values('操作日志','',4,5)   
+   
+   
+   
+select * from SysFun   
+   
+--建立存放角色基本信息   
+if exists(select * from sysobjects where name='RoleInfo')   
+    drop table RoleInfo   
+go   
+create table RoleInfo   
+(   
+RoleId int primary key identity(1,1),           --角色id   
+RoleName varchar(50) not null,          --角色名称   
+RoleDesc varchar(500)          --角色描述   
+)   
+go   
+   
+--向角色表中插入记录   
+insert into RoleInfo values('系统管理员','拥有本系统最高管理权限')   
+insert into RoleInfo values('普通用户','一般用户')   
+insert into RoleInfo values('未审批用户','还没使用该系统的权限')   
+insert into RoleInfo values('公司老总','拥有最高的检查权')   
+insert into RoleInfo values('部门经理','管辖本部门相关工作')   
+insert into RoleInfo values('临时角色','测试几个项目')   
+   
+select * from RoleInfo   
+   
+--建立存放所有角色权限表(RoleRight)   
+if exists(select * from sysobjects where name='RoleRight')   
+    drop table RoleRight   
+go   
+create table RoleRight   
+(   
+RoleRightId int identity(1,1),    --角色权限id   
+RoleId int foreign key references RoleInfo(RoleId) not null,          --角色id   
+NodeId int foreign key references SysFun(NodeId) not null    --菜单节点id   
+)   
+go   
+   
+--向角色权限表中插入数据   
+insert into RoleRight values(1,101)   
+insert into RoleRight values(1,102)   
+insert into RoleRight values(1,103)   
+insert into RoleRight values(1,104)   
+insert into RoleRight values(1,105)   
+insert into RoleRight values(1,106)   
+insert into RoleRight values(1,101001)   
+insert into RoleRight values(1,101002)   
+insert into RoleRight values(1,101003)   
+insert into RoleRight values(1,102001)   
+insert into RoleRight values(1,102002)   
+insert into RoleRight values(1,102003)   
+insert into RoleRight values(1,103001)   
+insert into RoleRight values(1,103002)   
+insert into RoleRight values(1,103003)   
+insert into RoleRight values(1,104001)   
+insert into RoleRight values(1,104002)   
+insert into RoleRight values(1,105001)   
+insert into RoleRight values(1,105002)   
+insert into RoleRight values(1,105003)   
+insert into RoleRight values(1,105004)   
+insert into RoleRight values(1,106001)   
+insert into RoleRight values(1,106002)   
+insert into RoleRight values(1,106003)   
+insert into RoleRight values(2,102)   
+insert into RoleRight values(2,103)   
+insert into RoleRight values(2,104)   
+insert into RoleRight values(2,106)   
+   
+insert into RoleRight values(2,102001)   
+insert into RoleRight values(2,102002)   
+insert into RoleRight values(2,102003)   
+insert into RoleRight values(2,103001)   
+insert into RoleRight values(2,103002)   
+insert into RoleRight values(2,103003)   
+insert into RoleRight values(2,104001)   
+insert into RoleRight values(2,104002)   
+insert into RoleRight values(2,106001)   
+insert into RoleRight values(2,106002)   
+insert into RoleRight values(2,106003)   
+   
+select * from RoleRight   
+select * from RoleRight where RoleId=1   
+select * from RoleRight where RoleRightId=2   
+select * from RoleRight where RoleId=1 and NodeId in (select NodeId from SysFun where ParentNodeId=0)   
+--建立存放用户基本信息表(UserInfo)   
+if exists(select * from sysobjects where name='UserInfo')   
+    drop table UserInfo   
+go   
+create table UserInfo   
+(   
+UserId varchar(50) primary key not null,    --用户唯一标识   
+UserName varchar(50) not null,               --真实姓名   
+PassWord varchar(50) not null,      --密码   
+DepartId int not null,         --所在部门   
+Gender int not null,        --性别   
+RoleId int foreign key references RoleInfo(RoleId) not null,   --用户角色   
+UserState int foreign key references UserState(UserStateId) not null, -----------------------------------------------用户状态   
+IfDeleteUser int not null,        --是否被删除1:没删除 0:已删除   
+UserPricter varchar(50) null   
+)   
+go   
+alter table UserInfo add UserPricter varchar(50) null   
+select UserId from UserInfo where DepartId in (select DepartId from DepartInfo where BranchId=1) and DepartId=1   
+--向用户表中插入信息   
+insert into UserInfo values('libeibei','李贝贝','libeibei',1,2,2,2,1,'images/Users/libeibei.jpg')   
+insert into UserInfo values('qijingxue','齐静雪','qijingxue',1,2,2,2,1,'images/Users/qijingxue.jpg')   
+insert into UserInfo values('yangjiali','杨嘉丽','yangjiali',1,2,2,2,1,'')   
+insert into UserInfo values('a','系统管理员','1',2,2,1,2,1,'images/Users/admin.jpg')   
+insert into UserInfo values('wuliping','武力平','wuliping',2,1,2,2,1,'')   
+insert into UserInfo values('liuguangping','刘广平','liuguangping',3,1,2,2,1,'')   
+insert into UserInfo values('wangchao','王超','王超',4,1,2,2,1,'images/Users/wangchao.jpg')   
+insert into UserInfo values('jiyaoqin','姬耀钦','jiyaoqin',5,1,2,2,1,'')   
+insert into UserInfo values('yuanbin','袁斌','yuanbin',5,1,2,2,1,'')   
+   
+select * from UserInfo    
+select * from UserInfo where UserId!='a'   
+update UserInfo set UserPricter='image/yuanbin.jpg' where UserId='yuanbin'   
+--建立文件信息表(FileInfo)   
+if exists(select * from sysobjects where name='FileInfo')   
+    drop table FileInfo   
+go   
+create table FileInfo   
+(   
+FileId int primary key identity(1,1),    --文件Id   
+FileName varchar(50) not null,     --文件名称   
+FileType int foreign key references FileTypeInfo(FileTypeId) not null,    --文件类型   
+Remark varchar(50),               --备注   
+FileOwner varchar(50) not null,     --创建者   
+CreateDate DateTime not null,     --创建日期   
+ParentId int not null,     --父节点Id   
+FilePath varchar(200) not null,    --文件路径   
+IfDelete int not null,       --是否已删除。0：已删除、1：未删除   
+DeleteTime DateTime    
+)   
+go   
+   
+   
+--向文件信息表中插入数据   
+insert into FileInfo values('公共文档',1,'对整个系统的整体概括和总结','a','2007-12-12 11:00:00',0,'E:\\公共文档',1,'')   
+insert into FileInfo values('管理制度',1,'公司的整个管理规范','jiyaoqin','2007-12-16 12:00:00',0,'E:\\管理制度',1,'')   
+insert into FileInfo values('部门文档',1,'各部门的文件分类','a','2007-12-16 9:00:00',0,'E:\\部门文档',1,'')   
+insert into FileInfo values('研发部',1,'研发部相关资料','yangjiali','2007-12-16 19:00:00',3,'E:\\部门文档\研发部',1,'')   
+insert into FileInfo values('部门员工介绍',1,'介绍所有研发部员工的详细信息','a','2007-12-21 11:06:00',4,'E:\\部门文档\\研发部\\部门员工介绍',1,'')   
+insert into FileInfo values('所有项目',1,'所有可用的项目汇总','a','2008-1-12 13:30:00',4,'E:\\部门文档\\研发部\\所有项目',1,'')   
+insert into FileInfo values('MyOffice',1,'bishexiangmu','a','2008-3-21 8:45:00',4,'E:\\部门文档\\研发部\\MyOffice',1,'')   
+insert into FileInfo values('游戏点卡销售系统',2,'毕业设计项目','a','2008-4-25 10:45:04',6,'E:\\部门文档\\研发部\\游戏点卡销售系统',1,'')   
+insert into FileInfo values('ACCP员工基本资料',2,'若要查询详情，请查看员工详细信息','a','2008-6-2 15:00:00',5,'E\:\部门文档\\研发部\\ACCP员工基本资料',1,'')   
+insert into FileInfo values('MyOffice说明文档',2,'说明文档','a','2008-6-1 12:00:00',7,'E:\\部门文档\\研发部\\MyOffice说明文档',1,'')   
+   
+select * from FileInfo   
+select * from FileInfo where FileId=0 and IfDelete=1   
+select * from FileInfo where FileName like '%文档%' and CreateDate between '2008-6-2 0:00:00' and '2008-6-3 23:59:59'   
+select * from FileInfo where FileId=4 and IfDelete=1   
+--建立附件文件表(AccessoryFile)   
+if exists(select * from sysobjects where name='AccessoryFile')   
+    drop table AccessoryFile   
+go   
+create table AccessoryFile   
+(   
+AccessoryId int primary key identity(1,1),    --文件附件Id   
+FileId int foreign key references FileInfo(FileId) not null,              --文件Id   
+AccessoryName varchar(50) not null,      --附件名称   
+AccessorySize int not null,                    --附件大小   
+AccessoryType int not null,                   --附件类型   
+CreateDate DateTime not null,               --创建日期   
+AccessoryPath varchar(200) not null    --附件路径   
+)   
+go   
+   
+insert into AccessoryFile values(10,'企业短信系统设计说明书',314880,2,'2008-7-1 12:20:54','E:\\部门文档\\研发部\\MyOffice说明文档\企业短信系统设计说明书.doc')   
+insert into AccessoryFile values(8,'游戏点卡销售系统附件','345',3,'2008-6-24 9:10:00','E:\\部门文档\\研发部\\游戏点卡销售系统附件')   
+select * from AccessoryFile   
+--建立部门信息表(DepartInfo)   
+   
+if exists(select * from sysobjects where name='DepartInfo')   
+    drop table DepartInfo   
+go   
+create table DepartInfo   
+(   
+DepartId int primary key identity(1,1),     --部门id   
+DepartName varchar(50) not null,            --部门名称   
+PrincipalUser varchar(50) foreign key references UserInfo(UserId) not null,          --部门负责人   
+ConnectTelNo bigint,         --联系电话   
+ConnectMobileTelNo bigint,     --移动电话   
+Fares bigint,        --传真   
+BranchId int not null,       --所属机构   
+IfDeleteDepart int not null      --部门是否被删除1：未删除  0：已删除   
+)   
+go   
+   
+--向部门信息表中插入数据   
+insert into DepartInfo values('销售部','qijingxue',13454356545,3454567,4354678,1,1)   
+insert into DepartInfo values('研发部','a',13478989878,6756456,8978787,2,1)   
+insert into DepartInfo values('综合部','liuguangping',13456564532,6756577,8954365,3,1)   
+insert into DepartInfo values('培训部','wangchao',13478957687,56748656,9078654,3,1)   
+insert into DepartInfo values('发电部','yuanbin',13564567876,6756877,6543234,4,1)   
+   
+   
+   
+select * from UserInfo where DepartId in (select DepartId from DepartInfo where BranchId=1 and IfDeleteDepart=1 and DepartId=1)   
+   
+select * from DepartInfo   
+--建立考勤信息表(ManualSign)   
+if exists(select * from sysobjects where name='ManualSign')   
+    drop table ManualSign   
+go   
+create table ManualSign   
+(   
+SignId int primary key identity(1,1),     --签卡Id   
+UserId varchar(50) foreign key references UserInfo(UserId) not null,           --用户Id   
+SignTime DateTime not null,             --签卡时间   
+SignDesc varchar(200) not null,     --签卡备注   
+SignTag int not null       --签卡标记   0:签到   1：签退   
+)   
+go   
+   
+select * from ManualSign   
+select from ManualSign where SignTime between '2008-6-23 0:00:00' and '2008-6-23 23:59:59'   
+--建立消息类型表(MessageType)   
+if exists(select * from sysobjects where name='MessageType')   
+    drop table MessageType   
+go   
+create table MessageType   
+(   
+MessageTypeId int primary key identity(1,1),           --消息类型Id   
+MessageTypeName varchar(50) not null,       --消息类型名称   
+MessageDesc varchar(50)     --消息类型描述   
+)   
+go   
+   
+--向消息类型表中插入数据   
+insert into MessageType values('紧急消息','十万火急')   
+insert into MessageType values('一般消息','普通消息')   
+   
+select * from MessageType   
+--建立消息表(Message)   
+if exists(select * from sysobjects where name='Message')   
+    drop table Message   
+go   
+create table Message   
+(   
+MessageId int primary key identity(1,1),      --消息Id   
+Title varchar(100) not null,            --消息标题   
+Content varchar(5000) not null,            --消息内容   
+Type int foreign key references MessageType(MessageTypeId) not null,               --消息类型   
+BeginTime DateTime not null,           --开始有效时间   
+EndTime DateTime not null,             --有效时间   
+FromUserId varchar(50) foreign key references UserInfo(UserId) not null,        --发送者   
+IfPublish int not null,    --是否已发布   
+RecordTime DateTime not null,      --发送时间   
+)   
+go   
+   
+--向消息表中插入数据   
+insert into Message values('会议','人民大会',2,'2008-6-20 8:30', '2008-6-23 17:00','a',1,'2008-6-17 2:18')   
+insert into Message values('关于记者证考试日程安排','请所有远程中合理安排考试时间进行记者证考试',1,'2008-7-13 8:30', '2008-7-23 17:00','wuliping',1,'2008-6-20 2:18')   
+insert into Message values('年终报销通知','年终结算，请及时查看',2,'2008-1-6 10:15:3','2008-12-20 10:15','a',0,'2007-12-12')   
+   
+select * from Message   
+select * from Message where BeginTime between '2008-6-1' and '2008-7-29' and EndTime between '2008-6-1' and '2008-7-19'   
+select * from Message where RecordTime between '' and '' and IfPublish=1   
+   
+   
+--建立用户已读消息表(ReadCommonMessage)   
+if exists(select * from sysobjects where name='ReadCommonMessage')   
+    drop table ReadCommonMessage   
+go   
+create table ReadCommonMessage   
+(   
+ReadId int primary key identity(1,1),     --序号Id   
+MessageId int not null,               --消息Id   
+UserId varchar(50) foreign key references UserInfo(UserId) not null      --消息读取者   
+)   
+go   
+   
+select * from ReadCommonMessage   
+   
+--建立消息发送对象(MessageToUser)   
+if exists(select * from sysobjects where name='MessageToUser')   
+    drop table MessageToUser   
+go   
+create table MessageToUser   
+(   
+Id int primary key identity(1,1),     --序号Id   
+MessageId int foreign key references Message(MessageId) not null,       --消息Id   
+ToUserId varchar(50) not null,        --发送对象Id   
+IfRead int not null      --是否已读。1：已读、0：未读   
+)   
+go   
+   
+select * from MessageToUser   
+select * from MessageToUser where MessageId=6   
+insert into MessageToUser values(3,'liuguangping',1)   
+--建立登陆日志表(LoginLog)   
+if exists(select * from sysobjects where name='LoginLog')   
+    drop table LoginLog   
+go   
+create table LoginLog   
+(   
+LoginId int primary key identity(1,1),       --登陆日志Id   
+UserId varchar(50) foreign key references UserInfo(UserId) not null,                 --登陆者   
+LoginTime DateTime not null,          --登陆时间   
+IfSuccess int not null,              --登陆是否成功.1:成功 0:失败   
+LoginUserIp varchar(100) not null,    --登陆用户IP   
+LoginDesc varchar(100)              --登陆备注   
+)   
+go   
+   
+select * from LoginLog   
+   
+--建立操作日志表(OperateLog)   
+if exists(select * from sysobjects where name='OperateLog')   
+    drop table OperateLog   
+go   
+create table OperateLog   
+(   
+OperateId int primary key identity(1,1),          --操作日志Id   
+UserId varchar(50) foreign key references UserInfo(UserId) not null,             --操作者   
+OperateName varchar(50) not null,      --操作名称   
+ObjectId varchar(50) not null,           --操作对象Id   
+OperateDesc varchar(200) not null,           --操作描述   
+OperateTime DateTime not null      --操作时间   
+)   
+go   
+   
+select * from OperateLog   
+--建立个人便签表(MyNote)   
+if exists(select * from sysobjects where name='MyNote')   
+    drop table MyNote   
+go   
+create table MyNote   
+(   
+NoteId int primary key identity(1,1),            --便签Id   
+NoteTitle varchar(50) not null,             --便签标题   
+NoteContent varchar(500),               --便签内容   
+CreateTime DateTime not null,       --创建时间   
+CreateUser varchar(50) foreign key references UserInfo(UserId) not null   --创建者   
+)   
+go   
+   
+--向个人便签中插入记录   
+insert into MyNote values('个人工作','5-9:做会议总结。5-10:出差考察。5-11晚：有公司晚会','2008-3-4','a')   
+insert into MyNote values('教师分类毕业设计项目总结','根据每位同学的项目进度，做项目时的态度，及项目完成情况作出总结。','2008-6-4','a')   
+insert into MyNote values('快速记事快速记事快速记事...','想要快速记忆，就要多动脑','2008-6-1','a')   
+insert into MyNote values('记事本','用于记载要文','2008-5-15','a')   
+insert into MyNote values('办公自动化','全自动化的办公，方便快捷，易于管理，节省人力、时间','2008-3-28','a')   
+insert into MyNote values('本月工作总结','本月工作充实，从中学到很多知识，做了几个项目，多按时完成','2008-2-4','a')   
+insert into MyNote values('Dot Net 代码规范','区分大小写，打点可以点出它的方法和属性','2008-3-24','a')   
+   
+select * from MyNote   
+   
+--建立会议类型表(MeetingInfo)   
+if exists(select * from sysobjects where name='MeetingInfo')   
+    drop table MeetingInfo   
+go   
+create table MeetingInfo   
+(   
+MeetingId int primary key identity(1,1),       --会议类型Id   
+MeetingName varchar(50) not null             --会议类型名称   
+)   
+go   
+   
+--向会议类型表中插入数据   
+insert into MeetingInfo values('公司年会')   
+insert into MeetingInfo values('机构会议')   
+insert into MeetingInfo values('部门会议')   
+insert into MeetingInfo values('小组会议')   
+insert into MeetingInfo values('外部合作会议')   
+   
+select * from MeetingInfo   
+--建立日程表(Schedule)   
+if exists(select * from sysobjects where name='Schedule')   
+    drop table Schedule   
+go   
+create table Schedule   
+(   
+ScheduleId int primary key identity(1,1),      --日程Id   
+Title varchar(50) not null,                --日程标题   
+Address varchar(500) not null,           --会议地址   
+MeetingId int foreign key references MeetingInfo(MeetingId) not null,       --会议类型   
+BeginTime DateTime not null,             --日程开始时间   
+EndTime DateTime not null,              --日程结束时间   
+SchContent varchar(500) not null,   --日程内容   
+CreateUser varchar(50) not null,         --创建者   
+CreateTime DateTime not null,         --创建时间   
+IfPrivate int not null    --是否私有   0否  1：是   
+)   
+go   
+   
+select * from Schedule   
+select * from Schedule where CreateTime='2008-6-27 7:06:48' and CreateUser='a'   
+insert into Schedule values('aaa','aaa',2,'2008-06-13 1:00:00','2008-06-13 15:34:12','gggggg','qijingxue','2008-06-16 5:24:00',1)   
+insert into Schedule values('aaa','aaa',2,'2008-06-18 1:00:00','2008-06-18 15:34:12','gggggg','qijingxue','2008-06-16 5:24:00',1)   
+select * from Schedule where CreateTime between '2008-06-18 00:00:00' and '2008-06-18 14:00:00'   
+select * from Schedule where BeginTime  between '2008-06-18 00:00:00' and '2008-06-18 23:59:50' and IfPrivate=1   
+select * from Schedule where BeginTime  between '2008-06-18 00:00:00' and '2008-06-18 23:59:50' and CreateUser='a' or ScheduleId in (select ScheduleId from Schedule where BeginTime    between '2008-06-18 00:00:00' and '2008-06-18 23:59:50' and IfPrivate=1)   
+select * from Schedule where BeginTime  between '2008-06-18 00:00:00' and '2008-06-18 23:59:50' and CreateUser='a'   
+select a.* from Schedule a,UserInfo b,DepartInfo c where a.CreateUser = b.UserId and b.DepartId = c.DepartId and c.DepartId=1 and IfPrivate=0 and convert(varchar(10),a.BeginTime,23)='2008-06-18' union select a.* from Schedule a,UserInfo b,DepartInfo c where a.CreateUser = b.UserId and a.CreateUser='a' and b.DepartId = c.DepartId and c.DepartId=1  and IfPrivate=1 and convert(varchar(10),a.BeginTime,23)='2008-06-18'   
+select ScheduleId from Schedule where CreateUser='a' and convert(varchar(10),CreateTime,23)='2008-06-23'   
+select ScheduleId from Schedule where CreateUser='a' and convert(varchar(10),CreateTime,23)='2008-06-27'   
+delete from Schedule where ScheduleId=5   
+--建立预约人表(PreContract)   
+if exists(select * from sysobjects where name='PreContract')   
+    drop table PreContract   
+go   
+create table PreContract   
+(   
+PreContractId int primary key identity(1,1),       --预约序号Id   
+ScheduleId int foreign key references Schedule(ScheduleId) not null,                --日程Id   
+UserId varchar(50) not null     --预约人   
+)   
+go   
+   
+insert into PreContract values(1,'libeibei')   
+insert into PreContract values(1,'qijingxue')   
+insert into PreContract values(2,'libeibei')   
+insert into PreContract values(1,'wangchao')   
+insert into PreContract values(3,'qijingxue')   
+select * from PreContract   
+select * from PreContract where ScheduleId=3   
+   
+   
+   
+select * from PreContract where PreContractId=1   
+select a.* from Schedule a,UserInfo b,DepartInfo c where a.CreateUser = b.UserId and b.DepartId = c.DepartId and c.DepartId=2 and IfPrivate=0 and convert(varchar(10),a.BeginTime,23)='2008-07-05' union select a.* from Schedule a,UserInfo b,DepartInfo c where a.CreateUser = b.UserId and a.CreateUser='a' and b.DepartId = c.DepartId and c.DepartId=2  and IfPrivate=1 and convert(varchar(10),a.BeginTime,23)='2008-07-05'   
+   
+select * from Schedule where CreateUser='a' and convert(varchar(10),CreateTime,23)='2008-06-30'   
+   
+   
+select * from Schedule where CreateUser='a' and convert(varchar(10),CreateTime,23)='2008-07-02'   
+select * from Schedule where CreateUser='a' and convert(varchar(10),CreateTime,23)='2008-07-04'   
+   
+   
+   
+select * from SysFun where NodeId in (select NodeId from RoleRight where RoleId=1) order by DisplayOrder asc   
+   
